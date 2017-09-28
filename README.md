@@ -17,3 +17,5 @@ Will create three new devices in the kentil portal with the minimal number of re
 Lines beginning with '#' are ignored.
 
 There is some minimal error handling to help diagnose failed updates. 
+
+123
