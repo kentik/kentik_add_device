@@ -1,0 +1,7 @@
+router_test1,router,Test Router 1,2144,1365,100,10.254.254.1,10.254.254.1,testcommunity
+router_test2,router,Test Router 2,2144,1365,100,10.254.254.2,10.254.254.2,testcommunity
+router_test3,router,Test Router 3,2144,1365,100,10.254.254.3,10.254.254.3,testcommunity
+router_test4,router,Test Router 4,2144,1365,100,10.254.254.4,10.254.254.4,testcommunity
+router_test5,router,Test Router 5,2144,1365,100,10.254.254.5,10.254.254.5,testcommunity
+router_test6,router,Test Router 6,2144,1365,100,10.254.254.6,10.254.254.6,testcommunity
+router_test7,router,Test Router 7,2144,1365,100,10.254.254.7,10.254.254.7,testcommunity
