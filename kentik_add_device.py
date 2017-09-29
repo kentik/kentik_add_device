@@ -5,11 +5,12 @@
 #
 #  createde by Steve Meuse 9/25/2017  <smeuse@kentik.com>
 #
-
+import os
+import stat
 import json, requests, time
 from os.path import expanduser
 import os.path
-
+import sys
 
 filename = 'sample.csv'
 
@@ -18,23 +19,30 @@ good = 0
 bad = 0
 
 def get_creds():
-	# TODO: check permisions on file and fail if not set to 600
-	homeDir = expanduser("~")
-	credsFile = ".kauth"
-	credsFile = homeDir + "/" + credsFile
-	if os.path.isfile(credsFile):
-		with open(credsFile) as f:
-			content = f.read()
-		creds = json.loads(content)
-		return(creds)
-	else:
-		pass
+    homeDir = expanduser("~")
+    credsFile = ".kauth"
+    credsFile = homeDir + "/" + credsFile
+    perms = oct(stat.S_IMODE(os.lstat(credsFile).st_mode))
+    if not perms == "0600":
+            print "Your credentials file is not set to 600, please fix"
+            sys.exit()
+    if os.path.isfile(credsFile):
+        with open(credsFile) as f:
+            content = f.read()
+            creds = json.loads(content)
+            return(creds)
+    else:
+        pass
+
+while get_creds() == False:
+    break
 
 def skip_comments(filename):
     with open(filename, 'r') as f:
         for line in f:
             if not line.strip().startswith('#'):
                yield line
+
 
 api = get_creds()['api']
 email = get_creds()['email']
@@ -63,28 +71,28 @@ for line in skip_comments(filename):
 	device['device']=kentikjson
 	kpush = json.dumps(device)
 	print kpush
-	rkentik = requests.post('https://api.kentik.com/api/v5/device', headers=payload, data=kpush)
-
-
-	if rkentik.status_code == 201:
-		print 'device "%s" added successfully' % (devicename)
-		good += 1
-
-	elif rkentik.status_code == 400:
-		if 'Already Exists' in rkentik.text:
-			print 'Device %s already exists in the Kentik device list' % (devicename)
-		else:
-			print 'Error code 400, your JSON is likely formatted incorrectly or you have a wrong data type for a json variable'
-			break
-
-	elif rkentik.status_code == 401:
-		print 'Error code 401, you are not authorized. Check your API Key or Kentik email address'
-		break
-
-	else:
-		print 'device "%s" not added: Error Code %s' % (devicename, rkentik.status_code)
-		bad += 1
-
-	time.sleep(1)
-
-print "%s Devices sucessfully added \n%s devices failed to add" % (good, bad)
+# 	rkentik = requests.post('https://api.kentik.com/api/v5/device', headers=payload, data=kpush)
+#
+#
+# 	if rkentik.status_code == 201:
+# 		print 'device "%s" added successfully' % (devicename)
+# 		good += 1
+#
+# 	elif rkentik.status_code == 400:
+# 		if 'Already Exists' in rkentik.text:
+# 			print 'Device %s already exists in the Kentik device list' % (devicename)
+# 		else:
+# 			print 'Error code 400, your JSON is likely formatted incorrectly or you have a wrong data type for a json variable'
+# 			break
+#
+# 	elif rkentik.status_code == 401:
+# 		print 'Error code 401, you are not authorized. Check your API Key or Kentik email address'
+# 		break
+#
+# 	else:
+# 		print 'device "%s" not added: Error Code %s' % (devicename, rkentik.status_code)
+# 		bad += 1
+#
+# 	time.sleep(1)
+#
+# print "%s Devices sucessfully added \n%s devices failed to add" % (good, bad)
