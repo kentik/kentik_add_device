@@ -70,29 +70,31 @@ for line in skip_comments(filename):
 	device = {}
 	device['device']=kentikjson
 	kpush = json.dumps(device)
-	print kpush
-# 	rkentik = requests.post('https://api.kentik.com/api/v5/device', headers=payload, data=kpush)
-#
-#
-# 	if rkentik.status_code == 201:
-# 		print 'device "%s" added successfully' % (devicename)
-# 		good += 1
-#
-# 	elif rkentik.status_code == 400:
-# 		if 'Already Exists' in rkentik.text:
-# 			print 'Device %s already exists in the Kentik device list' % (devicename)
-# 		else:
-# 			print 'Error code 400, your JSON is likely formatted incorrectly or you have a wrong data type for a json variable'
-# 			break
-#
-# 	elif rkentik.status_code == 401:
-# 		print 'Error code 401, you are not authorized. Check your API Key or Kentik email address'
-# 		break
-#
-# 	else:
-# 		print 'device "%s" not added: Error Code %s' % (devicename, rkentik.status_code)
-# 		bad += 1
-#
-# 	time.sleep(1)
-#
-# print "%s Devices sucessfully added \n%s devices failed to add" % (good, bad)
+	#print kpush
+	rkentik = requests.post('https://api.kentik.com/api/v5/device', headers=payload, data=kpush)
+
+
+	if rkentik.status_code == 201:
+		print 'device "%s" added successfully' % (devicename)
+		good += 1
+
+	elif rkentik.status_code == 400:
+		if 'Already Exists' in rkentik.text:
+			print 'Device %s aleady exists in the Kentik device list' % (devicename)
+                else:
+                    print 'Error code 400, your JSON is likely formatted incorrectly or you have a wrong data type for a json variable'
+                    bad += 1
+                    break
+
+	elif rkentik.status_code == 401:
+		print 'Error code 401, you are not authorized. Check your API Key or Kentik email address'
+                bad += 1
+                break
+
+	else:
+		print 'device "%s" not added: Error Code %s' % (devicename, rkentik.status_code)
+		bad += 1
+
+	time.sleep(1)
+
+print "%s Devices sucessfully added \n%s devices failed to add" % (good, bad)
