@@ -18,6 +18,12 @@ filename = 'sample.csv'
 good = 0
 bad = 0
 
+#
+#  This code was borrowed from Dan Rohan whith a few tweaks.
+#  We're looking for $HOME/.kauth where the user creds should be stored
+#  as a json object. We'll dump out if the file is world readable, forcing
+#  the user to fix the perms.
+#
 def get_creds():
     homeDir = expanduser("~")
     credsFile = ".kauth"
@@ -37,6 +43,8 @@ def get_creds():
 while get_creds() == False:
     break
 
+#
+#  Open up the file and ignore any lines that begin with #
 def skip_comments(filename):
     with open(filename, 'r') as f:
         for line in f:
@@ -44,11 +52,22 @@ def skip_comments(filename):
                yield line
 
 
+# Get the user credentials and get the http header put together for when we submit the API query
 api = get_creds()['api']
 email = get_creds()['email']
 payload = {'Content-Type': 'application/json', 'X-CH-Auth-API-Token': api, 'X-CH-Auth-Email': email}
 
 
+# This next section iterates over each line of the .csv file and assigns each csv into a variable.
+# We then create the new Json object with the appropriate API variables. Kentikjson contains all the
+# API variables.
+#
+#  Note: It's important to pay attention to the Json types for each variable. For example, 'device_name' is
+#  a string, but iplist is an array of strings. Failure to assign the righ type rill result in a 400 error.
+#  The API documentation lists all the types.
+#
+#  Another Note: If you are assigning a device to a site, the site must already exist. Future versions of this
+#  script will likely dynamically create them, but it's currently a manual process
 
 for line in skip_comments(filename):
 	newline = line.rstrip()
@@ -56,7 +75,7 @@ for line in skip_comments(filename):
 	iplist = [ sendingips ]
 	kentikjson = {}
 	kentikjson['device_name']=devicename
-	kentikjson['device_type']=devicetype
+	kentikjson['device_type']='router'
 	kentikjson['device_description']=devicedescription
 	kentikjson['plan_id']=int(planid)
 	kentikjson['site_id']=int(siteid)
@@ -64,9 +83,17 @@ for line in skip_comments(filename):
 	kentikjson['sending_ips']=iplist
 	kentikjson['device_snmp_ip']=devicesnmpip
 	kentikjson['device_snmp_community']=devicesnmpcommunity
-	kentikjson['device_bgp_type']='none'
+    kentikjson['device_bgp_neighbor_ip']=sendingips
+    kentikjson['device_bgp_neighbor_ip6']=
+    kentikjson['device_bgp_neighbor_asn']=
+    kentikjson['device_bgp_password']=''
+	kentikjson['device_bgp_type']='device'
 	kentikjson['minimize_snmp']=False
 
+#
+#  Once Kentikjson is populated, we need to put that list of json variables into a new json object called "device"
+#
+#  INSERT example of a valid object
 	device = {}
 	device['device']=kentikjson
 	kpush = json.dumps(device)
@@ -74,6 +101,11 @@ for line in skip_comments(filename):
 	rkentik = requests.post('https://api.kentik.com/api/v5/device', headers=payload, data=kpush)
 
 
+# The rest is basically looking at the output of each request post and looking for error messages.
+# I've tried to figure out some basic issues with trial and Error. If a device isn't successfully
+# added I increase the bad counter. This allows for a basic report at the end of the script to
+# let you know how many sucess/fails you had.
+#
 	if rkentik.status_code == 201:
 		print 'device "%s" added successfully' % (devicename)
 		good += 1
