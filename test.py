@@ -19,7 +19,11 @@ good = 0
 bad = 0
 
 #
+<<<<<<< HEAD
 #  This code was borrowed from Dan Rohan
+=======
+#  This code was borrowed from Da
+>>>>>>> 2408848358f9f362eed2573b7fb71cd13ef46773
 def get_creds():
     homeDir = expanduser("~")
     credsFile = ".kauth"
@@ -64,6 +68,10 @@ plandict = {'1k': '3620', '500': '3621'}
 
 for line in skip_comments(filename):
     newline = line.rstrip()
+<<<<<<< HEAD
+=======
+	# devicename,devicetype,devicedescription,planid,siteid,devicesamplerate,sendingips,devicesnmpip,devicesnmpcommunity = newline.split(",")
+>>>>>>> 2408848358f9f362eed2573b7fb71cd13ef46773
     siteid,devicename,devicedescription,sendingips,v6add,asn,devicesnmpcommunity,devicesamplerate,planid = newline.split(",")
     iplist = [ sendingips ]
     site = siteid.upper()
