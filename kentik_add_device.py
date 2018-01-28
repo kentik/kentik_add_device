@@ -66,6 +66,21 @@ email = get_creds()['email']
 payload = {'Content-Type': 'application/json', 'X-CH-Auth-API-Token': api, 'X-CH-Auth-Email': email}
 
 
+# OPTIONAL:  If you want to add the site by the text site name
+# instead of the site_id, download the sites for the customer using
+# the API tester and store the json in a text file. This nex section
+# will read the file and load the contents into a dict.
+# Read in the json file for sites
+#
+# with open('tata.json', 'r') as data_file:
+#     json_data = data_file.read()
+#     data = json.loads(json_data)
+#
+# sitesdict = {}
+# for f in data['sites']:
+#     mydict[f['site_name']] = f['id']
+#
+
 # This next section iterates over each line of the .csv file and assigns each csv into a variable.
 # We then create the new Json object with the appropriate API variables. Kentikjson contains all the
 # API variables.
@@ -81,19 +96,20 @@ for line in skip_comments(filename):
 	newline = line.rstrip()
     siteid,devicename,devicedescription,sendingips,v6add,asn,devicesnmpcommunity,devicesamplerate,planid = newline.split(",")
 	iplist = [ sendingips ]
+    #site = siteid.upper()  # Optional, if you use the sitedict and customer uses uppercase site names
 	kentikjson = {}
 	kentikjson['device_name']=devicename
 	kentikjson['device_type']='router'
 	kentikjson['device_description']=devicedescription
 	kentikjson['plan_id']=int(planid)
-	kentikjson['site_id']=int(siteid)
+	kentikjson['site_id']=int)siteid) # or sitesdict[siteid]
 	kentikjson['device_sample_rate']=int(devicesamplerate)
 	kentikjson['sending_ips']=iplist
 	kentikjson['device_snmp_ip']=devicesnmpip
 	kentikjson['device_snmp_community']=devicesnmpcommunity
     kentikjson['device_bgp_neighbor_ip']=sendingips
-    kentikjson['device_bgp_neighbor_ip6']=
-    kentikjson['device_bgp_neighbor_asn']=
+    kentikjson['device_bgp_neighbor_ip6']=v6v6add
+    kentikjson['device_bgp_neighbor_asn']=asn
     kentikjson['device_bgp_password']=''
 	kentikjson['device_bgp_type']='device'
 	kentikjson['minimize_snmp']=False
