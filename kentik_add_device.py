@@ -12,9 +12,10 @@ from os.path import expanduser
 import os.path
 import sys
 
+# This is the file that contains the devices to be added
 filename = 'sample.csv'
 
-
+# Initialize the counters, see section on error checking
 good = 0
 bad = 0
 
@@ -24,6 +25,13 @@ bad = 0
 #  as a json object. We'll dump out if the file is world readable, forcing
 #  the user to fix the perms.
 #
+#  Example:
+#
+#  {
+#     "email":"email@useraccount.com",
+#     "api":"87as76v76f87asd876g876asd876bh89asd"
+#  }
+
 def get_creds():
     homeDir = expanduser("~")
     credsFile = ".kauth"
@@ -44,7 +52,7 @@ while get_creds() == False:
     break
 
 #
-#  Open up the file and ignore any lines that begin with #
+#  Open up the .csv file and ignore any lines that begin with #
 def skip_comments(filename):
     with open(filename, 'r') as f:
         for line in f:
@@ -71,7 +79,7 @@ payload = {'Content-Type': 'application/json', 'X-CH-Auth-API-Token': api, 'X-CH
 
 for line in skip_comments(filename):
 	newline = line.rstrip()
-	devicename,devicetype,devicedescription,planid,siteid,devicesamplerate,sendingips,devicesnmpip,devicesnmpcommunity = newline.split(",")
+    siteid,devicename,devicedescription,sendingips,v6add,asn,devicesnmpcommunity,devicesamplerate,planid = newline.split(",")
 	iplist = [ sendingips ]
 	kentikjson = {}
 	kentikjson['device_name']=devicename
@@ -89,6 +97,7 @@ for line in skip_comments(filename):
     kentikjson['device_bgp_password']=''
 	kentikjson['device_bgp_type']='device'
 	kentikjson['minimize_snmp']=False
+
 
 #
 #  Once Kentikjson is populated, we need to put that list of json variables into a new json object called "device"
